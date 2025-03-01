@@ -1,0 +1,12 @@
+# Maven target directory (compiled code)
+target/
+
+# VS Code settings
+.vscode/
+
+# Logs
+logs/
+*.log
+
+# Maven wrapper files (optional)
+.mvn/wrapper/maven-wrapper.jar

@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.leetcode.tracker.leetcode_tracker.LeetcodeTrackerApplicationTests
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.939 s -- in com.leetcode.tracker.leetcode_tracker.LeetcodeTrackerApplicationTests
