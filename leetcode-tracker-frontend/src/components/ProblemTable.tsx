@@ -10,45 +10,43 @@ const ProblemTable = () => {
     });
     
 
-    const columns = [
-        { Header: 'Title', accessor: 'title' },
-        { Header: 'Difficulty', accessor: 'difficulty' },
-        { Header: 'Status', accessor: 'status' },
-        { Header: 'Submission Time', accessor: 'submissionTime' },
-        { Header: 'Execution Time', accessor: 'executionTime' },
-        { Header: 'Language', accessor: 'languageUsed' }
+    const columns: ColumnDef<any>[] = [
+        { header: 'Title', accessorKey: 'title' },
+        { header: 'Difficulty', accessorKey: 'difficulty' },
+        { header: 'Status', accessorKey: 'status' },
+        { header: 'Submission Time', accessorKey: 'submissionTime' },
+        { header: 'Execution Time', accessorKey: 'executionTime' },
+        { header: 'Language', accessorKey: 'languageUsed' }
     ];
+    
 
-    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data: data || [] });
-
-    if (isLoading) return <p>Loading...</p>;
-    if (error) return <p>Error fetching problems</p>;
-
+    const table = useReactTable({
+        data: data || [],
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+    });
+    
     return (
-        <table {...getTableProps()}>
+        <table>
             <thead>
-                {headerGroups.map(headerGroup => (
-                    <tr {...headerGroup.getHeaderGroupProps()}>
-                        {headerGroup.headers.map(column => (
-                            <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+                {table.getHeaderGroups().map(headerGroup => (
+                    <tr key={headerGroup.id}>
+                        {headerGroup.headers.map(header => (
+                            <th key={header.id}>{flexRender(header.column.columnDef.header, header.getContext())}</th>
                         ))}
                     </tr>
                 ))}
             </thead>
-            <tbody {...getTableBodyProps()}>
-                {rows.map(row => {
-                    prepareRow(row);
-                    return (
-                        <tr {...row.getRowProps()}>
-                            {row.cells.map(cell => (
-                                <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                            ))}
-                        </tr>
-                    );
-                })}
+            <tbody>
+                {table.getRowModel().rows.map(row => (
+                    <tr key={row.id}>
+                        {row.getVisibleCells().map(cell => (
+                            <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                        ))}
+                    </tr>
+                ))}
             </tbody>
         </table>
-    );
-};
-
+    );    
+}
 export default ProblemTable;
