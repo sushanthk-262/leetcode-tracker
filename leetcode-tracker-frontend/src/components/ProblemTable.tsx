@@ -1,10 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchProblems } from '../api/problemService';
-import { Cell } from 'react-table';
-import { useTable } from 'react-table';
+import { useReactTable, getCoreRowModel, flexRender, ColumnDef } from '@tanstack/react-table';
+
 
 const ProblemTable = () => {
-    const { data, error, isLoading } = useQuery(['problems'], fetchProblems);
+    const { data, error, isLoading } = useQuery({
+        queryKey: ['problems'],
+        queryFn: fetchProblems
+    });
+    
 
     const columns = [
         { Header: 'Title', accessor: 'title' },
@@ -36,7 +40,7 @@ const ProblemTable = () => {
                     prepareRow(row);
                     return (
                         <tr {...row.getRowProps()}>
-                            {row.cells.map((cell: Cell<any>) => ( // Explicitly type cell
+                            {row.cells.map(cell => (
                                 <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                             ))}
                         </tr>
