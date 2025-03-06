@@ -10,5 +10,7 @@ public class Problem {
     private String title;
     private String difficulty;
     private String status;
-    // Getters and Setters
+    private String submissionTime;
+    private String executionTime;
+    private String languageUsed;
 }
