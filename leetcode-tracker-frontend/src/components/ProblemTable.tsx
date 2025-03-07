@@ -1,31 +1,28 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchProblems } from '../api/problemService';
-import { useReactTable, getCoreRowModel, flexRender, ColumnDef } from '@tanstack/react-table';
+import { fetchUserSubmissions } from '../api/submissionService';
+import { useReactTable, getCoreRowModel, flexRender } from '@tanstack/react-table';
 
+const ProblemTable = ({ userId }: { userId: number }) => {
+    const { data, error, isLoading } = useQuery({ queryKey: ['submissions', userId], queryFn: () => fetchUserSubmissions(userId) });
 
-const ProblemTable = () => {
-    const { data, error, isLoading } = useQuery({
-        queryKey: ['problems'],
-        queryFn: fetchProblems
-    });
-    
-
-    const columns: ColumnDef<any>[] = [
-        { header: 'Title', accessorKey: 'title' },
-        { header: 'Difficulty', accessorKey: 'difficulty' },
-        { header: 'Status', accessorKey: 'status' },
-        { header: 'Submission Time', accessorKey: 'submissionTime' },
-        { header: 'Execution Time', accessorKey: 'executionTime' },
-        { header: 'Language', accessorKey: 'languageUsed' }
+    const columns = [
+        { accessorKey: 'problem.title', header: 'Title' },
+        { accessorKey: 'problem.difficulty', header: 'Difficulty' },
+        { accessorKey: 'status', header: 'Status' },
+        { accessorKey: 'submissionTime', header: 'Submission Time' },
+        { accessorKey: 'executionTime', header: 'Execution Time' },
+        { accessorKey: 'languageUsed', header: 'Language' }
     ];
-    
 
     const table = useReactTable({
         data: data || [],
         columns,
-        getCoreRowModel: getCoreRowModel(),
+        getCoreRowModel: getCoreRowModel()
     });
-    
+
+    if (isLoading) return <p>Loading...</p>;
+    if (error) return <p>Error fetching submissions</p>;
+
     return (
         <table>
             <thead>
@@ -47,6 +44,7 @@ const ProblemTable = () => {
                 ))}
             </tbody>
         </table>
-    );    
-}
+    );
+};
+
 export default ProblemTable;
