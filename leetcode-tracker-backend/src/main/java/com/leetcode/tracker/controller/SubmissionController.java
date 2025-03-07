@@ -1,26 +1,33 @@
 package com.leetcode.tracker.controller;
 
-import com.leetcode.tracker.entity.Submission;
-import com.leetcode.tracker.repository.SubmissionRepository;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
+import java.util.*;
 
 @RestController
 @RequestMapping("/submissions")
 public class SubmissionController {
-    private final SubmissionRepository submissionRepository;
 
-    public SubmissionController(SubmissionRepository submissionRepository) {
-        this.submissionRepository = submissionRepository;
-    }
+    private static final String LEETCODE_API_URL = "https://leetcode.com/graphql";
 
-    @GetMapping("/{userId}")
-    public List<Submission> getUserSubmissions(@PathVariable Long userId) {
-        return submissionRepository.findByUserId(userId);
-    }
+    @GetMapping("/{username}")
+    public ResponseEntity<String> getUserSubmissions(@PathVariable String username) {
+        String query = """
+                {
+                  "query": "query recentSubmissions($username: String!) { recentSubmissionList(username: $username) { title statusDisplay lang timestamp } }",
+                  "variables": { "username": \""" + username + "\" }
+                }
+                """;
 
-    @PostMapping("/add")
-    public Submission addSubmission(@RequestBody Submission submission) {
-        return submissionRepository.save(submission);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> entity = new HttpEntity<>(query, headers);
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(LEETCODE_API_URL, HttpMethod.POST, entity,
+                String.class);
+
+        return ResponseEntity.ok(response.getBody());
     }
 }
