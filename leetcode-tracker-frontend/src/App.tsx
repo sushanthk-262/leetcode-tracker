@@ -3,17 +3,17 @@ import Login from './components/Login';
 import ProblemTable from './components/ProblemTable';
 
 const App = () => {
-    const [username, setUsername] = useState<string | null>(null);
+    const [user, setUser] = useState<{ username: string; id: number } | null>(null);
 
     return (
         <div>
-            {username ? (
+            {user ? (
                 <>
-                    <h1>Welcome back, {username}!</h1>
-                    <ProblemTable />
+                    <h1>Welcome back, {user.username}!</h1>
+                    <ProblemTable userId={user.id} />
                 </>
             ) : (
-                <Login setUsername={setUsername} />
+                <Login setUser={setUser} />
             )}
         </div>
     );

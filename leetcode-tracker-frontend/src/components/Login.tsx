@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-const Login = ({ setUsername }: { setUsername: (username: string) => void }) => {
+const Login = ({ setUser }: { setUser: (user: { username: string; id: number }) => void }) => {
     // State variables for username and password
     const [username, setUsernameInput] = useState('');
     const [password, setPassword] = useState('');
@@ -11,9 +11,11 @@ const Login = ({ setUsername }: { setUsername: (username: string) => void }) => 
         try {
             // Send POST request to login endpoint
             const response = await axios.post('http://localhost:8080/auth/login', { username, password });
-            // If login is successful, update the username in the parent component
+            // If login is successful, update the user in the parent component
             if (response.data === 'Login Successful') {
-                setUsername(username);
+                // Assuming the response contains user data
+                const userData = { username, id: response.data.userId };
+                setUser(userData);
             }
         } catch (error) {
             console.error('Login failed:', error);
