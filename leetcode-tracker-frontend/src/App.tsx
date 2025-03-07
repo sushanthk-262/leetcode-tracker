@@ -1,19 +1,21 @@
 import { useState } from 'react';
-import Login from './components/Login';
 import ProblemTable from './components/ProblemTable';
 
 const App = () => {
-    const [user, setUser] = useState<{ username: string; id: number } | null>(null);
+    const [username, setUsername] = useState<string | null>(null);
 
     return (
         <div>
-            {user ? (
+            {username ? (
                 <>
-                    <h1>Welcome back, {user.username}!</h1>
-                    <ProblemTable userId={user.id} />
+                    <h1>Welcome back, {username}!</h1>
+                    <ProblemTable username={username} />
                 </>
             ) : (
-                <Login setUser={setUser} />
+                <div>
+                    <input type="text" placeholder="Enter your LeetCode username" onChange={(e) => setUsername(e.target.value)} />
+                    <button onClick={() => setUsername(username)}>Fetch Submissions</button>
+                </div>
             )}
         </div>
     );

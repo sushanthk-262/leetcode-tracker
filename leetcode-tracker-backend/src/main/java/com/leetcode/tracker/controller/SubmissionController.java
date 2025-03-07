@@ -16,18 +16,24 @@ public class SubmissionController {
         String query = """
                 {
                   "query": "query recentSubmissions($username: String!) { recentSubmissionList(username: $username) { title statusDisplay lang timestamp } }",
-                  "variables": { "username": \""" + username + "\" }
+                  "variables": { "username": "%s" }
                 }
-                """;
+                """
+                .formatted(username);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<String> entity = new HttpEntity<>(query, headers);
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(LEETCODE_API_URL, HttpMethod.POST, entity,
-                String.class);
 
-        return ResponseEntity.ok(response.getBody());
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(LEETCODE_API_URL, HttpMethod.POST, entity,
+                    String.class);
+            return ResponseEntity.ok(response.getBody());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error fetching data from LeetCode: " + e.getMessage());
+        }
     }
 }
