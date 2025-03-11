@@ -3,10 +3,9 @@ package com.leetcode.tracker.controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
-import java.util.*;
 
 @RestController
-@RequestMapping("/submissions")
+@RequestMapping("/api/submissions")
 public class SubmissionController {
 
     private static final String LEETCODE_API_URL = "https://leetcode.com/graphql";
