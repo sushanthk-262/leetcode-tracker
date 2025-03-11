@@ -1,23 +1,22 @@
 import { useState } from 'react';
 import ProblemTable from './components/ProblemTable';
+import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 const App = () => {
-    const [username, setUsername] = useState<string | null>(null);
+    const [username, setUsername] = useState("");
+    const [searchUsername, setSearchUsername] = useState<string | null>(null);
+    const queryClient = useQueryClient();
 
     return (
-        <div>
-            {username ? (
-                <>
-                    <h1>Welcome back, {username}!</h1>
-                    <ProblemTable username={username} />
-                </>
-            ) : (
-                <div>
-                    <input type="text" placeholder="Enter your LeetCode username" onChange={(e) => setUsername(e.target.value)} />
-                    <button onClick={() => setUsername(username)}>Fetch Submissions</button>
-                </div>
-            )}
-        </div>
+        <QueryClientProvider client={queryClient}>
+            <div>
+                <input type="text" placeholder="Enter your LeetCode username" value={username} onChange={(e) => setUsername(e.target.value)} />
+                <button onClick={() => setSearchUsername(username)}>Fetch Submissions</button>
+                {searchUsername && <ProblemTable username={searchUsername} />}
+            </div>
+        </QueryClientProvider>
     );
 };
 

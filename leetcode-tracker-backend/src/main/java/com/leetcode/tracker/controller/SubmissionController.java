@@ -3,9 +3,10 @@ package com.leetcode.tracker.controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
+import java.util.*;
 
 @RestController
-@RequestMapping("/api/submissions")
+@RequestMapping("/submissions")
 public class SubmissionController {
 
     private static final String LEETCODE_API_URL = "https://leetcode.com/graphql";
@@ -15,24 +16,18 @@ public class SubmissionController {
         String query = """
                 {
                   "query": "query recentSubmissions($username: String!) { recentSubmissionList(username: $username) { title statusDisplay lang timestamp } }",
-                  "variables": { "username": "%s" }
+                  "variables": { "username": \"" + username + "\" }
                 }
-                """
-                .formatted(username);
+                """;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<String> entity = new HttpEntity<>(query, headers);
         RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(LEETCODE_API_URL, HttpMethod.POST, entity,
+                String.class);
 
-        try {
-            ResponseEntity<String> response = restTemplate.exchange(LEETCODE_API_URL, HttpMethod.POST, entity,
-                    String.class);
-            return ResponseEntity.ok(response.getBody());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error fetching data from LeetCode: " + e.getMessage());
-        }
+        return ResponseEntity.ok(response.getBody());
     }
 }
