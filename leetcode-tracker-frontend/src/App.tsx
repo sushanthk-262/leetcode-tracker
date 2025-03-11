@@ -7,7 +7,6 @@ const queryClient = new QueryClient();
 const App = () => {
     const [username, setUsername] = useState("");
     const [searchUsername, setSearchUsername] = useState<string | null>(null);
-    const queryClient = useQueryClient();
 
     return (
         <QueryClientProvider client={queryClient}>

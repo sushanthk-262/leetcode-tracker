@@ -9,25 +9,24 @@ import java.util.*;
 @RequestMapping("/submissions")
 public class SubmissionController {
 
-    private static final String LEETCODE_API_URL = "https://leetcode.com/graphql";
+  private static final String LEETCODE_API_URL = "https://leetcode.com/graphql";
 
-    @GetMapping("/{username}")
-    public ResponseEntity<String> getUserSubmissions(@PathVariable String username) {
-        String query = """
-                {
-                  "query": "query recentSubmissions($username: String!) { recentSubmissionList(username: $username) { title statusDisplay lang timestamp } }",
-                  "variables": { "username": \"" + username + "\" }
-                }
-                """;
+  @GetMapping("/{username}")
+  public ResponseEntity<String> getUserSubmissions(@PathVariable String username) {
+    String query = """
+        {
+          "query": "query recentSubmissions($username: String!) { recentSubmissionList(username: $username) { title statusDisplay lang timestamp } }",
+          "variables": { "username": \"" + username + "\" }
+        }
+        """;
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<String> entity = new HttpEntity<>(query, headers);
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(LEETCODE_API_URL, HttpMethod.POST, entity,
-                String.class);
+    HttpEntity<String> entity = new HttpEntity<>(query, headers);
+    RestTemplate restTemplate = new RestTemplate();
+    ResponseEntity<String> response = restTemplate.exchange(LEETCODE_API_URL, HttpMethod.POST, entity, String.class);
 
-        return ResponseEntity.ok(response.getBody());
-    }
+    return ResponseEntity.ok(response.getBody());
+  }
 }
