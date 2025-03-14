@@ -11,12 +11,15 @@ const App: React.FC = () => {
         setLoading(true);
         try {
             const data = await fetchUserSubmissions(username);
-            setSubmissions(data.recentSubmissionList || []);
+            const submissionsList = data.data ? data.data.recentSubmissionList : data.recentSubmissionList;
+            setSubmissions(submissionsList || []);
+            console.log('Fetched submissions:', submissionsList);
         } catch (error) {
             console.error(error);
         }
         setLoading(false);
     };
+    
 
     return (
         <div>

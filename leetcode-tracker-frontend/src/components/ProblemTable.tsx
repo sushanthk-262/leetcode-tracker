@@ -1,19 +1,20 @@
-import { useQuery } from '@tanstack/react-query';
-import { fetchUserSubmissions } from '../api/submissionService';
+import React from 'react';
 
-const ProblemTable = ({ username }: { username: string }) => {
-    const { data, error, isLoading } = useQuery({
-        queryKey: ['submissions', username],
-        queryFn: () => fetchUserSubmissions(username),
-        enabled: Boolean(username) // Query runs only when username is truthy
-    });
+type Submission = {
+    title: string;
+    statusDisplay: string;
+    lang: string;
+    timestamp: string;
+};
 
-    console.log("API Response:", data); // For debugging
+type ProblemTableProps = {
+    submissions: Submission[];
+};
 
-    if (isLoading) return <p>Loading...</p>;
-    if (error) return <p>Error fetching submissions</p>;
-    if (!data || !data.recentSubmissionList || data.recentSubmissionList.length === 0) return <p>No submissions found</p>;
-
+const ProblemTable: React.FC<ProblemTableProps> = ({ submissions }) => {
+    if (submissions.length === 0) {
+        return <p>No submissions found.</p>;
+    }
     return (
         <table>
             <thead>
@@ -25,12 +26,12 @@ const ProblemTable = ({ username }: { username: string }) => {
                 </tr>
             </thead>
             <tbody>
-                {data.recentSubmissionList.map((submission: any, index: number) => (
+                {submissions.map((submission, index) => (
                     <tr key={index}>
                         <td>{submission.title}</td>
                         <td>{submission.statusDisplay}</td>
                         <td>{submission.lang}</td>
-                        <td>{new Date(submission.timestamp * 1000).toLocaleString()}</td>
+                        <td>{new Date(Number(submission.timestamp) * 1000).toLocaleString()}</td>
                     </tr>
                 ))}
             </tbody>
