@@ -26,10 +26,10 @@ const ProblemTable: React.FC<ProblemTableProps> = ({ submissions }) => {
             const titleSlug = convertTitleToSlug(submission.title);
             try {
                 const probData = await fetchProblemDetails(titleSlug);
-                const difficulty = probData.data?.question?.difficulty || 'N/A';                
+                const difficulty = probData.data?.question?.difficulty || 'N/A';
                 const codeData = await fetchSubmissionDetail(submission.submissionId);
-                const code = codeData.data?.submissionDetail?.code || 'N/A';
-                
+                const code = codeData.data?.submissionDetails?.code || 'N/A';
+
                 setDetails(prev => ({
                     ...prev,
                     [submission.submissionId]: { difficulty, code }
@@ -56,8 +56,8 @@ const ProblemTable: React.FC<ProblemTableProps> = ({ submissions }) => {
                 </tr>
             </thead>
             <tbody>
-                {submissions.map((submission) => (
-                    <tr key={submission.submissionId}>
+                {submissions.map((submission, index) => (
+                    <tr key={submission.submissionId || index}>
                         <td>{submission.title}</td>
                         <td>{details[submission.submissionId]?.difficulty || 'Loading...'}</td>
                         <td>{submission.lang}</td>
