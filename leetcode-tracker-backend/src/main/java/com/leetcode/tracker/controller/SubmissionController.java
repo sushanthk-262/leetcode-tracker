@@ -10,14 +10,16 @@ import org.springframework.web.client.RestTemplate;
 public class SubmissionController {
   @GetMapping("/{username}")
   public ResponseEntity<String> getUserSubmissions(@PathVariable String username) {
-    String query = String.format(
-        """
-            {
-              "query": "query recentSubmissions($username: String!) { recentSubmissionList(username: $username) { title statusDisplay lang timestamp } }",
-              "variables": { "username": "%s" }
+    String query = """
+        {
+          "query": "query recentSubmissions($username: String!) {
+            recentSubmissionList(username: $username) {
+              title statusDisplay lang timestamp submissionId
             }
-            """,
-        username);
+          }",
+          "variables": { "username": "%s" }
+        }
+        """.formatted(username);
 
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);

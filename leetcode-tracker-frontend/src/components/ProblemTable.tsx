@@ -7,7 +7,7 @@ type Submission = {
     statusDisplay: string;
     lang: string;
     timestamp: string;
-    submissionId?: string;
+    submissionId?: string; // Optional since API might not return it
 };
 
 type ProblemTableProps = {
@@ -23,12 +23,14 @@ const ProblemTable: React.FC<ProblemTableProps> = ({ submissions }) => {
 
     useEffect(() => {
         submissions.forEach(async (submission) => {
-            const key = submission.submissionId || submission.title;
             const titleSlug = convertTitleToSlug(submission.title);
+
             try {
+                // Fetch difficulty level
                 const probData = await fetchProblemDetails(titleSlug);
                 const difficulty = probData.data?.question?.difficulty || 'N/A';
 
+                // Fetch code only if submissionId is available
                 let code = 'N/A';
                 if (submission.submissionId) {
                     const codeData = await fetchSubmissionDetail(submission.submissionId);
@@ -36,10 +38,10 @@ const ProblemTable: React.FC<ProblemTableProps> = ({ submissions }) => {
                 } else {
                     console.warn(`Submission ID missing for ${submission.title}. Skipping code fetch.`);
                 }
-                
+
                 setDetails(prev => ({
                     ...prev,
-                    [key]: { difficulty, code }
+                    [titleSlug]: { difficulty, code }
                 }));
             } catch (error) {
                 console.error("Error fetching details for", submission.title, error);
@@ -63,25 +65,25 @@ const ProblemTable: React.FC<ProblemTableProps> = ({ submissions }) => {
                 </tr>
             </thead>
             <tbody>
-            {submissions
-                .filter(submission => submission.statusDisplay === "Accepted")
-                .map((submission) => {
-                    const key = submission.submissionId || `${submission.title}-${submission.timestamp}`;
-                    return (
-                        <tr key={key}>
-                            <td>{submission.title}</td>
-                            <td>{details[key]?.difficulty || 'Loading...'}</td>
-                            <td>{submission.lang}</td>
-                            <td>{new Date(Number(submission.timestamp) * 1000).toLocaleString()}</td>
-                            <td>
-                                <pre style={{ whiteSpace: 'pre-wrap', maxWidth: '300px' }}>
-                                    {details[key]?.code || 'Loading...'}
-                                </pre>
-                            </td>
-                        </tr>
-                    );
-                })}
-        </tbody>
+                {submissions
+                    .filter(submission => submission.statusDisplay === "Accepted") // Filter only "Accepted" solutions
+                    .map((submission) => {
+                        const key = submission.submissionId || convertTitleToSlug(submission.title) + "-" + submission.timestamp;
+                        return (
+                            <tr key={key}>
+                                <td>{submission.title}</td>
+                                <td>{details[convertTitleToSlug(submission.title)]?.difficulty || 'Loading...'}</td>
+                                <td>{submission.lang}</td>
+                                <td>{new Date(Number(submission.timestamp) * 1000).toLocaleString()}</td>
+                                <td>
+                                    <pre style={{ whiteSpace: 'pre-wrap', maxWidth: '300px' }}>
+                                        {details[convertTitleToSlug(submission.title)]?.code || 'Loading...'}
+                                    </pre>
+                                </td>
+                            </tr>
+                        );
+                    })}
+            </tbody>
         </table>
     );
 };
