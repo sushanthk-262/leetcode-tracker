@@ -7,7 +7,7 @@ type Submission = {
     statusDisplay: string;
     lang: string;
     timestamp: string;
-    submissionId: string;
+    submissionId?: string;
 };
 
 type ProblemTableProps = {
@@ -23,16 +23,23 @@ const ProblemTable: React.FC<ProblemTableProps> = ({ submissions }) => {
 
     useEffect(() => {
         submissions.forEach(async (submission) => {
+            const key = submission.submissionId || submission.title;
             const titleSlug = convertTitleToSlug(submission.title);
             try {
                 const probData = await fetchProblemDetails(titleSlug);
                 const difficulty = probData.data?.question?.difficulty || 'N/A';
-                const codeData = await fetchSubmissionDetail(submission.submissionId);
-                const code = codeData.data?.submissionDetails?.code || 'N/A';
 
+                let code = 'N/A';
+                if (submission.submissionId) {
+                    const codeData = await fetchSubmissionDetail(submission.submissionId);
+                    code = codeData.data?.submissionDetails?.code || 'N/A';
+                } else {
+                    console.warn(`Submission ID missing for ${submission.title}. Skipping code fetch.`);
+                }
+                
                 setDetails(prev => ({
                     ...prev,
-                    [submission.submissionId]: { difficulty, code }
+                    [key]: { difficulty, code }
                 }));
             } catch (error) {
                 console.error("Error fetching details for", submission.title, error);
@@ -56,20 +63,25 @@ const ProblemTable: React.FC<ProblemTableProps> = ({ submissions }) => {
                 </tr>
             </thead>
             <tbody>
-                {submissions.map((submission, index) => (
-                    <tr key={submission.submissionId || index}>
-                        <td>{submission.title}</td>
-                        <td>{details[submission.submissionId]?.difficulty || 'Loading...'}</td>
-                        <td>{submission.lang}</td>
-                        <td>{new Date(Number(submission.timestamp) * 1000).toLocaleString()}</td>
-                        <td>
-                            <pre style={{ whiteSpace: 'pre-wrap', maxWidth: '300px' }}>
-                                {details[submission.submissionId]?.code || 'Loading...'}
-                            </pre>
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
+            {submissions
+                .filter(submission => submission.statusDisplay === "Accepted")
+                .map((submission) => {
+                    const key = submission.submissionId || `${submission.title}-${submission.timestamp}`;
+                    return (
+                        <tr key={key}>
+                            <td>{submission.title}</td>
+                            <td>{details[key]?.difficulty || 'Loading...'}</td>
+                            <td>{submission.lang}</td>
+                            <td>{new Date(Number(submission.timestamp) * 1000).toLocaleString()}</td>
+                            <td>
+                                <pre style={{ whiteSpace: 'pre-wrap', maxWidth: '300px' }}>
+                                    {details[key]?.code || 'Loading...'}
+                                </pre>
+                            </td>
+                        </tr>
+                    );
+                })}
+        </tbody>
         </table>
     );
 };
