@@ -52,9 +52,9 @@ public class SubmissionController {
 
   @GetMapping("/submission-detail/{submissionId}")
   public ResponseEntity<String> getSubmissionDetail(@PathVariable String submissionId) {
-    String query = String.format(
-        "{ \"query\": \"query submissionDetail($submissionId: ID!) { submissionDetail(submissionId: $submissionId) { code } }\", \"variables\": { \"submissionId\": \"%s\" } }",
-        submissionId);
+    String query = """
+        { "query": "query submissionDetails($submissionId: ID!) { submissionDetails(submissionId: $submissionId) { code } }", "variables": { "submissionId\": \"" + submissionId + "\" } }
+        """;
 
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
