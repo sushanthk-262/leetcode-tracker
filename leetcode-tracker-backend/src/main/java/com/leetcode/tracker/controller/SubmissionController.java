@@ -8,6 +8,17 @@ import org.springframework.web.client.RestTemplate;
 @RequestMapping("/submissions")
 @CrossOrigin(origins = "http://localhost:3000")
 public class SubmissionController {
+
+  private HttpHeaders createHeaders() {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.add("Referer", "https://leetcode.com");
+    headers.add("Origin", "https://leetcode.com");
+    headers.add("User-Agent",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36");
+    return headers;
+  }
+
   @GetMapping("/{username}")
   public ResponseEntity<String> getUserSubmissions(@PathVariable String username) {
     String query = """
@@ -21,9 +32,7 @@ public class SubmissionController {
         }
         """.formatted(username);
 
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<String> entity = new HttpEntity<>(query, headers);
+    HttpEntity<String> entity = new HttpEntity<>(query, createHeaders());
     RestTemplate restTemplate = new RestTemplate();
 
     ResponseEntity<String> response = restTemplate.exchange(
@@ -37,13 +46,14 @@ public class SubmissionController {
 
   @GetMapping("/question/{titleSlug}")
   public ResponseEntity<String> getProblemDetails(@PathVariable String titleSlug) {
-    String query = String.format(
-        "{ \"query\": \"query questionData($titleSlug: String!) { question(titleSlug: $titleSlug) { difficulty } }\", \"variables\": { \"titleSlug\": \"%s\" } }",
-        titleSlug);
+    String query = """
+        {
+          "query": "query questionData($titleSlug: String!) { question(titleSlug: $titleSlug) { difficulty } }",
+          "variables": { "titleSlug": "%s" }
+        }
+        """.formatted(titleSlug);
 
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<String> entity = new HttpEntity<>(query, headers);
+    HttpEntity<String> entity = new HttpEntity<>(query, createHeaders());
     RestTemplate restTemplate = new RestTemplate();
 
     ResponseEntity<String> response = restTemplate.exchange(
@@ -54,13 +64,15 @@ public class SubmissionController {
 
   @GetMapping("/submission-detail/{submissionId}")
   public ResponseEntity<String> getSubmissionDetail(@PathVariable String submissionId) {
-    String query = String.format(
-        "{ \"query\": \"query submissionDetails($submissionId: ID!) { submissionDetails(submissionId: $submissionId) { code } }\", \"variables\": { \"submissionId\": \"%s\" } }",
-        submissionId);
+    String query = """
+        {
+          "query": "query submissionDetails($submissionId: ID!) { submissionDetails(submissionId: $submissionId) { code } }",
+          "variables": { "submissionId": "%s" }
+        }
+        """
+        .formatted(submissionId);
 
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<String> entity = new HttpEntity<>(query, headers);
+    HttpEntity<String> entity = new HttpEntity<>(query, createHeaders());
     RestTemplate restTemplate = new RestTemplate();
 
     ResponseEntity<String> response = restTemplate.exchange(
@@ -68,5 +80,4 @@ public class SubmissionController {
 
     return ResponseEntity.ok(response.getBody());
   }
-
 }
