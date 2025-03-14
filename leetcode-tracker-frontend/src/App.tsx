@@ -1,29 +1,37 @@
-import { useState } from 'react';
-import ProblemTable from './components/ProblemTable';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { loginToLeetCode } from './api/submissionService';
+import React, { useState } from "react";
+import { fetchUserSubmissions } from "./api/submissionService";
+import ProblemTable from "./components/ProblemTable";
 
-const queryClient = new QueryClient();
-
-const App = () => {
+const App: React.FC = () => {
     const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [searchUsername, setSearchUsername] = useState<string | null>(null);
+    const [submissions, setSubmissions] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = async () => {
-        await loginToLeetCode(username, password);
-        setSearchUsername(username);
+    const handleFetchSubmissions = async () => {
+        setLoading(true);
+        try {
+            const data = await fetchUserSubmissions(username);
+            setSubmissions(data.recentSubmissionList || []);
+        } catch (error) {
+            console.error(error);
+        }
+        setLoading(false);
     };
 
     return (
-        <QueryClientProvider client={queryClient}>
-            <div>
-                <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-                <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                <button onClick={handleLogin}>Login & Fetch Submissions</button>
-                {searchUsername && <ProblemTable username={searchUsername} />}
-            </div>
-        </QueryClientProvider>
+        <div>
+            <h1>LeetCode Tracker</h1>
+            <input 
+                type="text" 
+                value={username} 
+                onChange={(e) => setUsername(e.target.value)} 
+                placeholder="Enter LeetCode Username" 
+            />
+            <button onClick={handleFetchSubmissions} disabled={loading}>
+                {loading ? "Loading..." : "Fetch Submissions"}
+            </button>
+            <ProblemTable submissions={submissions} />
+        </div>
     );
 };
 
